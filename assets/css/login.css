@@ -1,0 +1,247 @@
+/* =========================================================
+   login.css — Login Page Styles
+   Structure: .login-wrapper > .login-left + .login-right
+   ========================================================= */
+
+/* --- Reset & Base --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 15px;
+  color: #1a1a1a;
+  background-color: #f4f5f7;
+  min-height: 100vh;
+}
+
+/* --- Page Layout: Two Columns --- */
+.login-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* =========================================================
+   LEFT PANEL — Logo / Branding
+   ========================================================= */
+.login-left {
+  flex: 1;
+       /* change to your brand color */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+}
+
+.brand {
+  text-align: center;
+  color: #ffffff;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.brand-name {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.brand-tagline {
+  font-size: 1rem;
+  color: black;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   RIGHT PANEL — Login Form
+   ========================================================= */
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background-color: #f4f5f7;
+}
+
+.form-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e0e3e8;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* --- Form Header --- */
+.form-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+}
+
+.form-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 1.75rem;
+  line-height: 1.5;
+}
+
+/* --- Form Fields --- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #1a3c6e;
+  box-shadow: 0 0 0 3px rgba(26, 60, 110, 0.12);
+  background-color: #ffffff;
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+}
+
+/* --- Remember Me & Forgot Password --- */
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+  accent-color: #1a3c6e;
+  width: 15px;
+  height: 15px;
+}
+
+.forgot-link {
+  color: #1a3c6e;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Submit Button --- */
+.btn-login {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #1a3c6e;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+
+.btn-login:hover {
+  background-color: #14305a;
+}
+
+.btn-login:active {
+  transform: scale(0.98);
+}
+
+/* --- Register Link --- */
+.register-link {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 1.5rem;
+}
+
+.register-link a {
+  color: #1a3c6e;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   RESPONSIVE — Stack on small screens
+   ========================================================= */
+@media (max-width: 768px) {
+  .login-wrapper {
+    flex-direction: column;
+  }
+
+  .login-left {
+    padding: 2.5rem 1.5rem;
+    flex: none;
+  }
+
+  .logo {
+    width: 80px;
+  }
+
+  .brand-name {
+    font-size: 1.5rem;
+  }
+
+  .login-right {
+    padding: 2rem 1rem;
+  }
+
+  .form-card {
+    padding: 1.75rem 1.25rem;
+  }
+}
