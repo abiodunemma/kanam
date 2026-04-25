@@ -1,9 +1,4 @@
-/* =========================================================
-   login.css — Login Page Styles
-   Structure: .login-wrapper > .login-left + .login-right
-   ========================================================= */
 
-/* --- Reset & Base --- */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -24,9 +19,7 @@ body {
   min-height: 100vh;
 }
 
-/* =========================================================
-   LEFT PANEL — Logo / Branding
-   ========================================================= */
+
 .login-left {
   flex: 1;
        /* change to your brand color */

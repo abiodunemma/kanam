@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Contact Manager</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
-   <link rel="stylesheet" href="../assets/css/contact.css" />
 </head>
 <body>
 
@@ -26,7 +25,7 @@
     </button>
   </header>
  
-
+  <!-- ── Main ── -->
   <main>
     <div class="section-title">Contacts</div>
     <div class="section-sub">Manage your team and external contacts</div>
