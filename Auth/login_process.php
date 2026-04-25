@@ -18,15 +18,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['username'] = $user['username'];
 
-    header("Location: dashbaord.php");
+    header("Location: ../dashbaord.php");
     exit();
     } else {
-        echo "Invalid password";
-
+        $_SESSION['error'] = "Invalid password";
+        header("Location: login.php");
+        exit();
     }
 
     }else{
-        echo "User not found";
+        $_SESSION['error'] = "User not found";
+        header("Location: login.php");
+        exit();
     }
         }
  ?>

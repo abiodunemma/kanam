@@ -37,7 +37,7 @@ session_start(); ?>
     <!-- LEFT: Logo / Branding -->
     <div class="login-left">
       <div class="brand">
-        <img src="/assets/img/Logo-2.png" alt="Company Logo" class="logo" />
+  <img src="/assets/img/Logo-2.png" alt="Company Logo" class="logo" />      
        
         <p class="brand-tagline">Welcome back. Sign in to continue.</p>
       </div>
@@ -46,19 +46,20 @@ session_start(); ?>
     <!-- RIGHT: Login Form -->
     <div class="login-right">
       <div class="form-card">
-        <h2 class="form-title">Sign In</h2>
-        <p class="form-subtitle">Enter your credentials to access your account</p>
+          <img src="/assets/img/Logo-2.png" alt="Company Logo" class="logo" />
+        <h2 class="form-title">Log in to your account</h2>
+        <p class="form-subtitle">Welcome back! Please enter your details.</p>
 
         <!-- ACTION points to your PHP handler -->
        <form action="login_process.php" method="post">
 
           <div class="form-group">
-            <label for="email">Email Address</label>
+            <label for="username">Username</label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="you@example.com"
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Enter your username"
               required
               autocomplete="email"
             />

@@ -77,12 +77,13 @@ body {
 }
 
 .form-card {
-  background: #ffffff;
+  /* background: #ffffff; */
   border-radius: 12px;
-  border: 1px solid #e0e3e8;
+  /* border: 1px solid #e0e3e8; */
   padding: 2.5rem 2rem;
   width: 100%;
   max-width: 420px;
+  text-align: center;
 }
 
 /* --- Form Header --- */
@@ -111,6 +112,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  align-items: flex-start;
 }
 
 .form-group label {
@@ -119,7 +121,7 @@ body {
   color: #374151;
 }
 
-.form-group input[type="email"],
+.form-group input[type="text"],
 .form-group input[type="password"] {
   width: 100%;
   padding: 0.65rem 0.9rem;
@@ -149,6 +151,8 @@ body {
   justify-content: space-between;
   font-size: 0.85rem;
   margin-top: 0.2rem;
+  margin-top: 9px;
+ margin-bottom: 2px;
 }
 
 .remember-me {
@@ -169,6 +173,8 @@ body {
   color: #1a3c6e;
   text-decoration: none;
   font-weight: 500;
+  color: #1366D9;
+ 
 }
 
 .forgot-link:hover {
@@ -182,7 +188,7 @@ body {
   font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
-  background-color: #1a3c6e;
+  background-color: #1366D9;
   border: none;
   border-radius: 8px;
   cursor: pointer;
