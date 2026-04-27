@@ -10,31 +10,72 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $stmt = $pdo->prepare("SELECT * FROM contacts");
 $stmt->execute();
 $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $name = $_POST['name'] ?? '';
-  $position = $_POST['position'] ?? '';
-  $email = $_POST['email'] ?? '';
-  $phone_number = $_POST['phone_number'] ?? '';
+   $action = $_POST['action'] ?? 'add';
 
+   //delete
+   if ($action === 'delete') {
+    $id = (int) $_POST['id'];
+    $stmt = $pdo->prepare("DELETE FROM contacts WHERE id = ?");
+    $stmt->execute([$id]);
+    header("Location: dashboard.php");
+    exit();
+    
+   }
+   //edit 
+   $id = (int)($_POST['id'] ?? 0);
+   $name = $_POST['name'] ?? '';
+   $position = $_POST['position'] ?? '';
+   $email = $_POST['email'] ?? '';
+   $phone_number = $_POST['phone_number'] ?? '';
+
+   //validate
   if (empty($name)) $error = "Name is required";
   if (empty($position)) $error = "Position is required";
   if (empty($email)) $error = "Email is required";
   if (empty($phone_number)) $error = "Phone number is required";
 
+  if (empty($error)) {
+    $check = $pdo->prepare("SELECT * FROM contacts WHERE email = ? And id != ?");
+ $check->execute([$email, $id]);
+ if ($check->fetch()) {
+      $error = "Contact with this email already exists";
+    }
+  }
 
-$stmt = $pdo->prepare('
- INSERT INTO contacts (name,position,email,phone_number) VALUES (?,?,?,?)');
+  if (empty($error)) {
+    if ($action === 'edit' && $id > 0) {
+      $stmt = $pdo->prepare("UPDATE contacts SET name = ?, position = ?, email = ?, phone_number = ? WHERE id = ?");
+      $stmt->execute([$name, $position, $email, $phone_number, $id]);
+    } else {
+       $stmt = $pdo->prepare('
+         INSERT INTO contacts (name,position,email,phone_number) VALUES (?,?,?,?)');
+       $stmt->execute([$name, $position, $email, $phone_number]);
+    }
+    header("Location: dashboard.php");
+    exit();
 
- $stmt->execute([$name, $position, $email, $phone_number]);
- var_dump($stmt->errorInfo());
-header("Location: dashboard.php");
-exit();
-
+    $stmt = $pdo->prepare("SELECT * FROM contacts");
+    $stmt->execute();
+    $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 }
-else {
-  echo "Invalid request method";
-}
+
+
+// $stmt = $pdo->prepare('
+//  INSERT INTO contacts (name,position,email,phone_number) VALUES (?,?,?,?)');
+
+//  $stmt->execute([$name, $position, $email, $phone_number]);
+//  var_dump($stmt->errorInfo());
+// header("Location: dashboard.php");
+// exit();
+
+// }
+// else {
+//   echo "Invalid request method";
+// }
 
 
 ?>
@@ -74,6 +115,12 @@ else {
     <div class="section-title">Contacts</div>
     <div class="section-sub">Manage your team and external contacts</div>
 
+     <?php if (!empty($error)): ?>
+  <div class="error-banner">
+    ⚠️ <?= htmlspecialchars($error) ?>
+  </div>
+<?php endif; ?>
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -94,8 +141,24 @@ else {
   <td><?= htmlspecialchars($c['position'] ?? 'null') ?></td>
   <td><?= htmlspecialchars($c['email'] ?? 'null') ?></td>
   <td><?= htmlspecialchars($c['phone_number'] ?? 'null') ?></td>
-  <td><button>Edit</button></td>
-  <td><button>Delete</button></td>
+
+  <td><button class="btn-edit" onclick="openModal(
+  <?= $c['id'] ?>,
+        '<?= addslashes(htmlspecialchars($c['name'])) ?>',
+        '<?= addslashes(htmlspecialchars($c['position'])) ?>',
+        '<?= addslashes(htmlspecialchars($c['email'])) ?>',
+        '<?= addslashes(htmlspecialchars($c['phone_number'])) ?>'
+  )" >Edit</button></td>
+
+
+
+  <td>
+    <form method="POST" action="../dashbaord.php" onsubmit="return confirm('Delete  this contact?')">
+      <input type="hidden" name="action" value="delete"/> 
+    <input type="hidden" name="id"  value="<?= $c['id'] ?>"/>
+      <button class="btn-delete" type="submit">Delete</button>
+    </form> 
+  </td>
 </tr>
 <?php endforeach; ?>
         </tbody>
@@ -107,7 +170,11 @@ else {
   <!-- ── Modal ── -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-       <form class="modal-form" method="POST" action="../dashbaord.php">
+       <form class="modal-form" method="POST" action="dashboard.php">
+
+       <input type="hidden" name="action" id="formAction" value="add" />
+      <input type="hidden" name="id" id="formId" value="0" />
+
       <div class="modal-title" id="modalTitle">Add New Contact</div>
 
       <div class="form-group" >
@@ -134,6 +201,8 @@ else {
       </form>
     </div>
   </div>
+
+ 
   </body>
  
   <script>
@@ -184,25 +253,29 @@ else {
       `).join('');
     }
  
-    function openModal(id = null) {
-      editId = id;
+    function openModal(id = null, name = '', position = '', email = '', phone_number = '') {
+    
       if (id) {
-        const c = contacts.find(x => x.id === id);
-        document.getElementById('edit').textContent = 'Edit Contact';
-        document.getElementById('name').value     = c.name;
-        document.getElementById('position').value = c.position;
-        document.getElementById('email').value = c.email;
-        document.getElementById('phone_number').value    = c.phone;
+ document.getElementById('modalTitle').textContent  = 'Edit Contact';
+    document.getElementById('formAction').value        = 'edit';
+    document.getElementById('formId').value            = id;
+    document.getElementById('name').value              = name;
+    document.getElementById('position').value          = position;
+    document.getElementById('email').value             = email;
+    document.getElementById('phone_number').value             = phone_number;
       } else {
-        document.getElementById('modalTitle').textContent = 'Add New Contact';
-        ['name','position','email','phone_number'].forEach(id => document.getElementById(id).value = '');
-      }
-      document.getElementById('modalOverlay').classList.add('open');
+       document.getElementById('modalTitle').textContent  = 'Add New Contact';
+    document.getElementById('formAction').value        = 'add';
+    document.getElementById('formId').value            = '0';
+    ['name','position','email','phone_number']
+      .forEach(f => document.getElementById(f).value = '');
     }
- 
+ document.getElementById('modalOverlay').classList.add('open');
+}
+
     function closeModal() {
       document.getElementById('modalOverlay').classList.remove('open');
-      editId = null;
+     
     }
  
    
