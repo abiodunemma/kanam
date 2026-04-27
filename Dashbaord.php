@@ -1,3 +1,44 @@
+<?php 
+session_start();
+require './config/db.php';
+
+$stmt = $pdo->prepare("SELECT * FROM users WHere username = ?");
+$username= $_SESSION['username'];
+$stmt->execute([$username]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare("SELECT * FROM contacts");
+$stmt->execute();
+$contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $name = $_POST['name'] ?? '';
+  $position = $_POST['position'] ?? '';
+  $email = $_POST['email'] ?? '';
+  $phone_number = $_POST['phone_number'] ?? '';
+
+  if (empty($name)) $error = "Name is required";
+  if (empty($position)) $error = "Position is required";
+  if (empty($email)) $error = "Email is required";
+  if (empty($phone_number)) $error = "Phone number is required";
+
+
+$stmt = $pdo->prepare('
+ INSERT INTO contacts (name,position,email,phone_number) VALUES (?,?,?,?)');
+
+ $stmt->execute([$name, $position, $email, $phone_number]);
+ var_dump($stmt->errorInfo());
+header("Location: dashboard.php");
+exit();
+
+}
+else {
+  echo "Invalid request method";
+}
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,16 +49,19 @@
    <link rel="stylesheet" href="../assets/css/contact.css" />
 </head>
 <body>
-
+   <?php if ($user): ?>
 <header>
     <div class="user-info">
       <div class="avatar" id="avatarInitials">JD</div>
       <div class="user-details">
-        <span class="user-name" id="displayName">John Doe</span>
+        <span class="user-name" id="displayName"><?=  htmlspecialchars($_SESSION['username']) ?></span>
         <span class="user-role">Administrator</span>
       </div>
     </div>
- 
+  <?php else: ?>
+    <div>wrong </div>
+     <?php endif; ?>
+
     <button class="btn-add" onclick="openModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -26,11 +70,10 @@
     </button>
   </header>
  
-
   <main>
     <div class="section-title">Contacts</div>
     <div class="section-sub">Manage your team and external contacts</div>
- 
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -44,51 +87,57 @@
           </tr>
         </thead>
         <tbody id="tableBody">
-          <!-- rows injected by JS -->
+        <?php foreach ($contacts as $c): ?>
+   
+  <tr>
+  <td><?= htmlspecialchars($c['name'] ?? 'null') ?></td>
+  <td><?= htmlspecialchars($c['position'] ?? 'null') ?></td>
+  <td><?= htmlspecialchars($c['email'] ?? 'null') ?></td>
+  <td><?= htmlspecialchars($c['phone_number'] ?? 'null') ?></td>
+  <td><button>Edit</button></td>
+  <td><button>Delete</button></td>
+</tr>
+<?php endforeach; ?>
         </tbody>
       </table>
+     
     </div>
   </main>
  
   <!-- ── Modal ── -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
+       <form class="modal-form" method="POST" action="../dashbaord.php">
       <div class="modal-title" id="modalTitle">Add New Contact</div>
- 
-      <div class="form-group">
+
+      <div class="form-group" >
         <label>Contact Name</label>
-        <input type="text" id="inputName" placeholder="e.g. Ada Okafor"/>
+        <input type="text" id="name" name="name" placeholder="e.g. Ada Okafor"/>
       </div>
       <div class="form-group">
         <label>Position</label>
-        <input type="text" id="inputPosition" placeholder="e.g. Product Manager"/>
+        <input type="text" id="position" name="position" placeholder="e.g. Product Manager"/>
       </div>
       <div class="form-group">
         <label>Email</label>
-        <input type="email" id="inputEmail" placeholder="e.g. ada@company.com"/>
+        <input type="email" id="email" name="email" placeholder="e.g. ada@company.com"/>
       </div>
       <div class="form-group">
         <label>Phone Number</label>
-        <input type="tel" id="inputPhone" placeholder="e.g. +234 801 234 5678"/>
+        <input type="tel" id="phone_number" name="phone_number" placeholder="e.g. +234 801 234 5678"/>
       </div>
  
       <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-save" onclick="saveContact()">Save Contact</button>
+<button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save"  type="submit" >Save Contact</button>
       </div>
+      </form>
     </div>
   </div>
+  </body>
  
   <script>
-    let contacts = [
-      { id: 1, name: "Amara Nwosu",   position: "Product Designer",  email: "amara@company.com",  phone: "+234 801 111 2233" },
-      { id: 2, name: "Chukwuemeka O", position: "Backend Engineer",   email: "emeka@company.com",  phone: "+234 802 345 6789" },
-      { id: 3, name: "Fatima Al-Said",position: "Marketing Lead",     email: "fatima@company.com", phone: "+234 803 987 6543" },
-      { id: 4, name: "Kofi Mensah",   position: "Sales Executive",    email: "kofi@company.com",   phone: "+233 244 123 456"  },
-    ];
- 
-    let editId = null;
-    let nextId = 10;
+   
  
     function initials(name) {
       return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -139,14 +188,14 @@
       editId = id;
       if (id) {
         const c = contacts.find(x => x.id === id);
-        document.getElementById('modalTitle').textContent = 'Edit Contact';
-        document.getElementById('inputName').value     = c.name;
-        document.getElementById('inputPosition').value = c.position;
-        document.getElementById('inputEmail').value    = c.email;
-        document.getElementById('inputPhone').value    = c.phone;
+        document.getElementById('edit').textContent = 'Edit Contact';
+        document.getElementById('name').value     = c.name;
+        document.getElementById('position').value = c.position;
+        document.getElementById('email').value = c.email;
+        document.getElementById('phone_number').value    = c.phone;
       } else {
         document.getElementById('modalTitle').textContent = 'Add New Contact';
-        ['inputName','inputPosition','inputEmail','inputPhone'].forEach(id => document.getElementById(id).value = '');
+        ['name','position','email','phone_number'].forEach(id => document.getElementById(id).value = '');
       }
       document.getElementById('modalOverlay').classList.add('open');
     }
@@ -156,42 +205,7 @@
       editId = null;
     }
  
-    function saveContact() {
-      const name     = document.getElementById('inputName').value.trim();
-      const position = document.getElementById('inputPosition').value.trim();
-      const email    = document.getElementById('inputEmail').value.trim();
-      const phone    = document.getElementById('inputPhone').value.trim();
- 
-      if (!name || !position || !email || !phone) {
-        alert('Please fill in all fields.');
-        return;
-      }
- 
-      if (editId) {
-        const c = contacts.find(x => x.id === editId);
-        Object.assign(c, { name, position, email, phone });
-      } else {
-        contacts.push({ id: nextId++, name, position, email, phone });
-      }
- 
-      closeModal();
-      render();
-    }
- 
-    function editContact(id)   { openModal(id); }
-    function deleteContact(id) {
-      if (confirm('Remove this contact?')) {
-        contacts = contacts.filter(c => c.id !== id);
-        render();
-      }
-    }
- 
-    // Close modal on overlay click
-    document.getElementById('modalOverlay').addEventListener('click', function(e) {
-      if (e.target === this) closeModal();
-    });
- 
-    render();
+   
   </script>
 </body>
 </html>
