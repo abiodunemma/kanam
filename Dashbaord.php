@@ -11,6 +11,7 @@ $stmt = $pdo->prepare("SELECT * FROM contacts");
 $stmt->execute();
 $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $error = '';
+$role = $user['role'] ?? 'user';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    $action = $_POST['action'] ?? 'add';
@@ -20,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int) $_POST['id'];
     $stmt = $pdo->prepare("DELETE FROM contacts WHERE id = ?");
     $stmt->execute([$id]);
-    header("Location: dashboard.php");
+    header("Location: dashbaord.php");
     exit();
     
    }
@@ -54,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          INSERT INTO contacts (name,position,email,phone_number) VALUES (?,?,?,?)');
        $stmt->execute([$name, $position, $email, $phone_number]);
     }
-    header("Location: dashboard.php");
+    header("Location: /dashbaord.php");
     exit();
 
     $stmt = $pdo->prepare("SELECT * FROM contacts");
@@ -96,19 +97,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="avatar" id="avatarInitials">JD</div>
       <div class="user-details">
         <span class="user-name" id="displayName"><?=  htmlspecialchars($_SESSION['username']) ?></span>
-        <span class="user-role">Administrator</span>
+        <span class="user-role"><?= htmlspecialchars($role) ?></span>
       </div>
     </div>
   <?php else: ?>
     <div>wrong </div>
      <?php endif; ?>
-
+<?php  if ($user['role'] ==='admin'): ?>
     <button class="btn-add" onclick="openModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
       Add New
     </button>
+<?php endif; ?>
+  
   </header>
  
   <main>
@@ -170,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- ── Modal ── -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-       <form class="modal-form" method="POST" action="dashboard.php">
+       <form class="modal-form" method="POST" action="/dashbaord.php">
 
        <input type="hidden" name="action" id="formAction" value="add" />
       <input type="hidden" name="id" id="formId" value="0" />
